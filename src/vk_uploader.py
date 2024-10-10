@@ -56,10 +56,6 @@ class VKUploader:
             print(f"An unexpected error occurred: {e}")
             raise
 
-    def auth_handler(self):
-        code = input("Enter 2FA code: ")
-        remember_device = True
-        return code, remember_device
 
     def captcha_handler(self, captcha):
         key = input(f"Enter captcha code {captcha.get_url()}: ")

@@ -4,23 +4,12 @@ from file_manager import FileManager
 from vk_uploader import VKUploader
 from vk_api.exceptions import AuthError, Captcha, ApiError
 import vk_api
+from config import VK_ACCESS_TOKEN
 
-def get_auth_method():
-    while True:
-        auth_method = input("Choose authentication method (1 for login/password, 2 for token): ")
-        if auth_method in ['1', '2']:
-            return auth_method
-        print("Invalid input. Please enter 1 or 2.")
-
-def get_auth_data(auth_method):
-    if auth_method == '2':
-        token = input("Enter your VK access token: ")
-        return {'token': token}
-    else:
-        login = input("Enter your VK login: ")
-        password = input("Enter your VK password: ")
-        app_id = input("Enter your VK app ID: ")
-        return {'login': login, 'password': password, 'app_id': app_id}
+def get_access_token():
+    if VK_ACCESS_TOKEN:
+        return VK_ACCESS_TOKEN
+    return input("Enter your VK access token: ")
 
 def get_video_folder_path():
     while True:
@@ -48,10 +37,8 @@ def main():
     vk_uploader = None
     while True:
         try:
-            auth_method = get_auth_method()
-            auth_data = get_auth_data(auth_method)
-
-            vk_uploader = VKUploader(auth_data)
+            token = get_access_token()
+            vk_uploader = VKUploader({'token': token})
             print("Authentication successful!")
             break
         except AuthError as e:
@@ -113,10 +100,10 @@ def main():
                 file_manager.add_to_delete_list(video_path)
                 total_uploaded += 1
             except ApiError as e:
-                print(f"VK API Error when uploading {os.path.basename(video_path)}: {e}")
+                print(f"VK API Error when uploading {metadata['filename']}: {e}")
                 total_failed += 1
             except Exception as e:
-                print(f"Unexpected error when uploading {os.path.basename(video_path)}: {e}")
+                print(f"Unexpected error when uploading {metadata['filename']}: {e}")
                 total_failed += 1
 
     total_end_time = time.time()
